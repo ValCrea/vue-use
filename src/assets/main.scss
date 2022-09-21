@@ -1,0 +1,36 @@
+$light-primary: #f0f0f5;
+$light-secondary: #e0e0e5;
+$boundry-light: #a0a0a5;
+$boundry-dark: #808085;
+$dark-primary: #202025;
+$dark-secondary: #303035;
+
+:root {
+  --background-primary: #{$light-primary};
+  --background-secondary: #{$light-secondary};
+  --text-primary: #{$dark-primary};
+  --text-secondary: #{$dark-secondary};
+  --border-color: #{$boundry-light};
+}
+
+:root.dark {
+  --background-primary: #{$dark-primary};
+  --background-secondary: #{$dark-secondary};
+  --text-primary: #{$light-primary};
+  --text-secondary: #{$light-secondary};
+  --border-color: #{$boundry-dark};
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  position: relative;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+}
