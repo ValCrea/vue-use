@@ -10,7 +10,8 @@ $dark-secondary: #303035;
   --background-secondary: #{$light-secondary};
   --text-primary: #{$dark-primary};
   --text-secondary: #{$dark-secondary};
-  --border-color: #{$boundry-light};
+  --border-primary: #{$boundry-light};
+  --border-secondary: #{$boundry-dark};
 }
 
 :root.dark {
@@ -18,7 +19,8 @@ $dark-secondary: #303035;
   --background-secondary: #{$dark-secondary};
   --text-primary: #{$light-primary};
   --text-secondary: #{$light-secondary};
-  --border-color: #{$boundry-dark};
+  --border-primary: #{$boundry-dark};
+  --border-secondary: #{$boundry-light};
 }
 
 *,

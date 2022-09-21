@@ -1,26 +1,81 @@
 <script setup lang="ts">
-import { useMouse, useDark, useToggle, useStorage } from "@vueuse/core";
+import { ref, type Ref } from "vue";
+import {
+  useMouse,
+  useDark,
+  useToggle,
+  useStorage,
+  useWindowSize,
+  useWindowScroll,
+  useEventListener,
+  onKeyStroke,
+  onLongPress,
+  onStartTyping,
+} from "@vueuse/core";
+
+type RefMaybeStr = Ref<string | null>;
+
+const { x: mouseX, y: mouseY } = useMouse();
 
 const isDark = useDark();
 const toggleDark = useToggle(isDark);
-const { x, y } = useMouse();
-
 const toggleDarkMode = () => {
   toggleDark();
   document.documentElement.classList.toggle("dark");
 };
 
 const state = useStorage("my-store", { name: "", pass: "" }, localStorage);
+
+const { width, height } = useWindowSize();
+
+const { x: scrollX, y: scrollY } = useWindowScroll();
+
+const clickLocation: RefMaybeStr = ref(null);
+useEventListener(document, "click", (event: MouseEvent) => {
+  clickLocation.value = `${event.clientX} ${event.clientY}`;
+});
+
+const arrowDownTime: RefMaybeStr = ref(null);
+onKeyStroke("ArrowDown", () => {
+  arrowDownTime.value = new Date().toLocaleString("en-UK");
+});
+
+const htmlRefHook = ref<HTMLElement | null>(null);
+const longPressedHook = ref(false);
+const onLongPressCallbackHook = () => {
+  longPressedHook.value = true;
+};
+const resetHook = () => {
+  longPressedHook.value = false;
+};
+onLongPress(htmlRefHook, onLongPressCallbackHook, {
+  modifiers: { prevent: true },
+});
+
+const lastKey: RefMaybeStr = ref(null);
+onStartTyping((event: KeyboardEvent) => {
+  lastKey.value = event.key;
+});
 </script>
 
 <template>
   <div class="showcase">
-    <p>Mouse at: {{ x }} {{ y }}</p>
+    <p>Mouse: {{ mouseX }} {{ mouseY }}</p>
     <button @click="toggleDarkMode()" class="btn">Toggle dark mode</button>
     <div class="showcase__element">
       <input v-model="state.name" type="text" />
       <input v-model="state.pass" type="text" />
     </div>
+    <p>Width: {{ width }}, Height: {{ height }}</p>
+    <p>Scroll: {{ scrollX }} {{ scrollY }}</p>
+    <p v-if="clickLocation">Last click location: {{ clickLocation }}</p>
+    <p v-if="arrowDownTime">Last arrow down time: {{ arrowDownTime }}</p>
+    <div class="showcase__element">
+      <button ref="htmlRefHook" class="btn">Long press</button>
+      Pressed: {{ longPressedHook }}
+      <button @click="resetHook" class="btn">Reset</button>
+    </div>
+    <p v-if="lastKey">Last key pressed: {{ lastKey }}</p>
   </div>
 </template>
 
@@ -48,7 +103,12 @@ const state = useStorage("my-store", { name: "", pass: "" }, localStorage);
   color: var(--text-secondary);
   background-color: var(--background-secondary);
 
-  border: solid 1px var(--border-color);
+  border: solid 1px var(--border-primary);
   border-radius: 0.25rem;
+
+  &:hover {
+    background-color: var(--border-primary);
+    border-color: var(--border-secondary);
+  }
 }
 </style>
