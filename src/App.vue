@@ -11,6 +11,15 @@ import {
   onKeyStroke,
   onLongPress,
   onStartTyping,
+  useBattery,
+  useDevicePixelRatio,
+  useDevicesList,
+  useNavigatorLanguage,
+  useOnline,
+  useTextSelection,
+  useNow,
+  useDateFormat,
+  useDebounceFn,
 } from "@vueuse/core";
 
 type RefMaybeStr = Ref<string | null>;
@@ -56,6 +65,26 @@ const lastKey: RefMaybeStr = ref(null);
 onStartTyping((event: KeyboardEvent) => {
   lastKey.value = event.key;
 });
+
+const { isSupported, charging } = useBattery();
+
+const { pixelRatio } = useDevicePixelRatio();
+
+const { devices } = useDevicesList();
+
+const { language } = useNavigatorLanguage();
+
+const online = useOnline();
+
+const selected = useTextSelection();
+
+const formattedTime = useDateFormat(useNow(), "YYYY-MM-DD HH:mm:ss");
+
+const registeredClicks = ref(0);
+const registeredEvents = ref(0);
+const debouncedFn = useDebounceFn(() => {
+  registeredEvents.value++;
+}, 1000);
 </script>
 
 <template>
@@ -76,6 +105,26 @@ onStartTyping((event: KeyboardEvent) => {
       <button @click="resetHook" class="btn">Reset</button>
     </div>
     <p v-if="lastKey">Last key pressed: {{ lastKey }}</p>
+    <p>
+      Battery charging:
+      <span v-if="isSupported">{{ charging }}</span>
+      <span v-else>Api not supported</span>
+    </p>
+    <p>Pixel ratio: {{ pixelRatio }}</p>
+    <p>Devices: {{ devices.map((device) => device.kind) }}</p>
+    <p>Language: {{ language }}</p>
+    <p>{{ online ? "You have Internet" : "You have no Internet" }}</p>
+    <p v-if="selected.text.value != ''">Selected text: {{ selected.text }}</p>
+    <p>Time: {{ formattedTime }}</p>
+    <button
+      @click="
+        registeredClicks++;
+        debouncedFn();
+      "
+      class="btn"
+    >
+      Clicks: {{ registeredClicks }} &nbsp; Events: {{ registeredEvents }}
+    </button>
   </div>
 </template>
 
